@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Control de Capacitaciones</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="data.js"></script>
+<style>
+  :root{
+    --bg:#F5F3EE;
+    --panel:#FFFFFF;
+    --ink:#1E2422;
+    --ink-soft:#5B6560;
+    --line:#DEDAD0;
+    --safety:#F2B705;
+    --safety-dark:#C99400;
+    --teal:#2B6777;
+    --ok:#3F8F5C;
+    --ok-bg:#E7F3EC;
+    --warn:#B4790A;
+    --warn-bg:#FBF0DC;
+    --danger:#B23A2E;
+    --danger-bg:#FBE9E6;
+    --muted:#8B8B82;
+    --muted-bg:#EFEDE6;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', system-ui, sans-serif;
+    line-height:1.45;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.display{
+    font-family:'Barlow Condensed', sans-serif;
+    letter-spacing:0.01em;
+  }
+
+  /* ---------- Header ---------- */
+  header.app-header{
+    background:var(--ink);
+    color:#F5F3EE;
+    padding:22px 28px 20px;
+    position:relative;
+    overflow:hidden;
+  }
+  header.app-header::after{
+    content:"";
+    position:absolute;
+    left:0; right:0; bottom:0;
+    height:6px;
+    background:repeating-linear-gradient(135deg,
+      var(--safety) 0px, var(--safety) 16px,
+      var(--ink) 16px, var(--ink) 32px);
+    opacity:0.9;
+  }
+  .header-row{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:16px;
+    flex-wrap:wrap;
+    max-width:1180px;
+    margin:0 auto;
+  }
+  .brand{display:flex; align-items:baseline; gap:12px;}
+  .brand h1{
+    font-size:30px;
+    font-weight:700;
+    margin:0;
+    line-height:1;
+    color:#fff;
+  }
+  .brand span.tag{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:var(--safety);
+    border:1px solid var(--safety-dark);
+    padding:3px 8px;
+    border-radius:999px;
+    text-transform:none;
+  }
+  .header-sub{
+    color:#C7CDC8;
+    font-size:14px;
+    margin-top:4px;
+  }
+  .file-actions{
+    display:flex;
+    gap:10px;
+    align-items:center;
+    flex-wrap:wrap;
+  }
+  .btn{
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:14px;
+    font-weight:500;
+    padding:10px 16px;
+    border-radius:8px;
+    border:1px solid transparent;
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    transition:transform .08s ease, background .15s ease;
+  }
+  .btn:active{transform:translateY(1px);}
+  .btn-primary{
+    background:var(--safety);
+    color:#211C08;
+  }
+  .btn-primary:hover{background:#e0aa04;}
+  .btn-ghost{
+    background:transparent;
+    border-color:#5B655F;
+    color:#F0EEE7;
+  }
+  .btn-ghost:hover{background:rgba(255,255,255,0.08);}
+  input[type=file]{display:none;}
+
+  /* ---------- Stats ---------- */
+  .stats-bar{
+    max-width:1180px;
+    margin:-18px auto 0;
+    padding:0 28px;
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap:12px;
+    position:relative;
+    z-index:2;
+  }
+  .stat-card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:14px 16px;
+    box-shadow:0 2px 0 rgba(30,36,34,0.03);
+  }
+  .stat-card .num{
+    font-family:'Barlow Condensed', sans-serif;
+    font-size:32px;
+    font-weight:700;
+    line-height:1;
+  }
+  .stat-card .lbl{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    margin-top:4px;
+  }
+  .stat-card.ok .num{color:var(--ok);}
+  .stat-card.warn .num{color:var(--warn);}
+  .stat-card.danger .num{color:var(--danger);}
+
+  /* ---------- Filters ---------- */
+  .filters{
+    max-width:1180px;
+    margin:18px auto 0;
+    padding:0 28px;
+  }
+  .filters-panel{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:16px;
+    display:grid;
+    grid-template-columns:1.4fr 1fr 1fr 1fr;
+    gap:12px;
+    align-items:end;
+  }
+  .field label{
+    display:block;
+    font-size:12px;
+    font-weight:600;
+    color:var(--ink-soft);
+    margin-bottom:5px;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+  }
+  .field input, .field select{
+    width:100%;
+    padding:9px 11px;
+    border-radius:7px;
+    border:1px solid var(--line);
+    background:#FCFBF8;
+    font-size:14px;
+    font-family:inherit;
+    color:var(--ink);
+  }
+  .field input:focus, .field select:focus{
+    outline:2px solid var(--teal);
+    outline-offset:1px;
+  }
+
+  /* ---------- Results ---------- */
+  .results-wrap{
+    max-width:1180px;
+    margin:20px auto 60px;
+    padding:0 28px;
+  }
+  .results-meta{
+    font-size:13.5px;
+    color:var(--ink-soft);
+    margin-bottom:12px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .results-meta a{color:var(--teal); cursor:pointer; text-decoration:underline;}
+
+  .employee-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(360px, 1fr));
+    gap:14px;
+  }
+  .emp-card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    overflow:hidden;
+  }
+  .emp-head{
+    padding:14px 16px 10px;
+    border-bottom:1px solid var(--line);
+  }
+  .emp-name{
+    font-size:17px;
+    font-weight:600;
+    margin:0 0 2px;
+  }
+  .emp-meta{
+    font-size:13px;
+    color:var(--ink-soft);
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px 12px;
+  }
+  .emp-meta b{color:var(--ink); font-weight:600;}
+  .legajo-chip{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    background:var(--muted-bg);
+    color:var(--ink-soft);
+    padding:2px 7px;
+    border-radius:5px;
+  }
+
+  table.train-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13.5px;
+  }
+  table.train-table th{
+    text-align:left;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.03em;
+    color:var(--ink-soft);
+    padding:8px 16px 6px;
+    font-weight:600;
+  }
+  table.train-table td{
+    padding:8px 16px;
+    border-top:1px solid #EFEDE6;
+    vertical-align:middle;
+  }
+  table.train-table tr:first-child td{border-top:none;}
+  .cap-name{font-weight:500;}
+  .status-pill{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:3px 9px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:600;
+    white-space:nowrap;
+  }
+  .status-pill .dot{width:7px; height:7px; border-radius:50%;}
+  .st-vigente{background:var(--ok-bg); color:var(--ok);}
+  .st-vigente .dot{background:var(--ok);}
+  .st-programado{background:var(--warn-bg); color:var(--warn);}
+  .st-programado .dot{background:var(--warn);}
+  .st-sinprogramar{background:var(--danger-bg); color:var(--danger);}
+  .st-sinprogramar .dot{background:var(--danger);}
+  .st-na{background:var(--muted-bg); color:var(--muted);}
+  .st-na .dot{background:var(--muted);}
+  .fecha-cell{color:var(--ink-soft); font-family:'IBM Plex Mono', monospace; font-size:12.5px;}
+
+  .empty-state{
+    text-align:center;
+    padding:60px 20px;
+    color:var(--ink-soft);
+  }
+  .empty-state h3{margin-bottom:6px; color:var(--ink);}
+
+  footer{
+    text-align:center;
+    font-size:12px;
+    color:var(--ink-soft);
+    padding:20px;
+  }
+
+  /* Modal (upload help) */
+  .modal-overlay{
+    position:fixed; inset:0;
+    background:rgba(20,24,22,0.55);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:50;
+    padding:20px;
+  }
+  .modal-overlay.open{display:flex;}
+  .modal{
+    background:var(--panel);
+    border-radius:12px;
+    max-width:480px;
+    width:100%;
+    padding:22px 24px;
+  }
+  .modal h3{margin-top:0;}
+  .modal ul{padding-left:18px; font-size:14px; color:var(--ink-soft);}
+  .modal code{
+    background:var(--muted-bg);
+    padding:1px 5px;
+    border-radius:4px;
+    font-size:12.5px;
+  }
+  .modal-actions{margin-top:16px; text-align:right;}
+
+  @media (max-width: 720px){
+    .stats-bar{grid-template-columns:repeat(2,1fr);}
+    .filters-panel{grid-template-columns:1fr 1fr;}
+    header.app-header{padding:18px 16px 18px;}
+    .stats-bar, .filters, .results-wrap{padding-left:16px; padding-right:16px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="header-row">
+    <div>
+      <div class="brand">
+        <h1>Control de Capacitaciones</h1>
+        <span class="tag" id="sourceTag">demo</span>
+      </div>
+      <div class="header-sub">Trabajos en caliente · Espacio confinado · Trabajo en altura · Corte y Bloqueo</div>
+    </div>
+    <div class="file-actions">
+      <a class="btn btn-ghost" href="../index.html" style="text-decoration:none">&larr; Portal</a>
+      <label class="btn btn-primary" for="fileInput">Cargar Excel (Base)</label>
+      <input type="file" id="fileInput" accept=".xlsx,.xls">
+      <button class="btn btn-ghost" id="helpBtn" type="button">¿Cómo funciona?</button>
+    </div>
+  </div>
+</header>
+
+<div class="stats-bar" id="statsBar"></div>
+
+<div class="filters">
+  <div class="filters-panel">
+    <div class="field">
+      <label for="qInput">Buscar (legajo o nombre)</label>
+      <input type="text" id="qInput" placeholder="Ej: 10023894 o Rossi">
+    </div>
+    <div class="field">
+      <label for="panaderiaSelect">Panadería</label>
+      <select id="panaderiaSelect"><option value="">Todas</option></select>
+    </div>
+    <div class="field">
+      <label for="sectorSelect">Sector</label>
+      <select id="sectorSelect"><option value="">Todos</option></select>
+    </div>
+    <div class="field">
+      <label for="estadoSelect">Estado</label>
+      <select id="estadoSelect">
+        <option value="">Todos</option>
+        <option value="SIN PROGRAMAR">Con pendientes (sin programar)</option>
+        <option value="PROGRAMADO">Con capacitación programada</option>
+        <option value="VIGENTE">Solo vigentes</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<div class="results-wrap">
+  <div class="results-meta">
+    <span id="resultsCount"></span>
+    <a id="clearFilters">Limpiar filtros</a>
+  </div>
+  <div class="employee-grid" id="employeeGrid"></div>
+</div>
+
+<footer>Datos cargados en el navegador — no se envían a ningún servidor.</footer>
+
+<div class="modal-overlay" id="helpModal">
+  <div class="modal">
+    <h3>Cómo usar esta herramienta</h3>
+    <ul>
+      <li>Tocá <b>"Cargar Excel (Base)"</b> y elegí tu archivo. Se lee la hoja <code>Base</code> (o la primera hoja si no existe una con ese nombre).</li>
+      <li>Columnas esperadas: <code>PANADERIA</code>, <code>SECTOR</code>, <code>LEGAJO</code>, <code>NOMBRE Y APELLIDO</code>, <code>FECHA</code>, <code>VIGENCIA2</code>, <code>Capacitacion</code>, <code>Requiere capacitacion</code>, <code>Estado capacitacion</code>.</li>
+      <li>Buscá por número de legajo o nombre, y filtrá por panadería, sector o estado.</li>
+      <li>Los datos quedan guardados en este navegador (no se suben a internet) para que no tengas que volver a cargarlos cada vez.</li>
+    </ul>
+    <div class="modal-actions"><button class="btn btn-primary" id="closeHelp">Entendido</button></div>
+  </div>
+</div>
+
+<script>
+const CAP_ORDER = ["Trabajos en caliente", "Espacio confinado", "Trabajo en altura", "Corte y Bloqueo"];
+const STORAGE_KEY = "capacitaciones_base_v1";
+
+let rawRows = [];
+let employees = [];
+
+// ---------- Helpers ----------
+function norm(v){
+  return (v === undefined || v === null) ? "" : String(v).trim();
+}
+function normUpper(v){
+  return norm(v).toUpperCase();
+}
+function statusClass(estado, requiere){
+  const e = normUpper(estado);
+  const r = normUpper(requiere);
+  if (r === "NO" || e === "N/A" || e === "") return "st-na";
+  if (e === "VIGENTE") return "st-vigente";
+  if (e === "PROGRAMADO") return "st-programado";
+  if (e === "SIN PROGRAMAR") return "st-sinprogramar";
+  return "st-na";
+}
+function statusLabel(estado, requiere){
+  const e = normUpper(estado);
+  const r = normUpper(requiere);
+  if (r === "NO") return "No requiere";
+  if (e === "N/A" || e === "") return "No aplica";
+  if (e === "VIGENTE") return "Vigente";
+  if (e === "PROGRAMADO") return "Programada";
+  if (e === "SIN PROGRAMAR") return "Sin programar";
+  return e;
+}
+
+// ---------- Build employees from raw rows ----------
+function buildEmployees(rows){
+  const map = new Map();
+  rows.forEach(row => {
+    const legajo = norm(row["LEGAJO"]);
+    const nombre = norm(row["NOMBRE Y APELLIDO"]);
+    const panaderia = norm(row["PANADERIA"]);
+    const sector = norm(row["SECTOR"]);
+    const key = (legajo || "SL") + "|" + nombre + "|" + panaderia + "|" + sector;
+
+    if (!map.has(key)){
+      map.set(key, {
+        legajo: legajo || "(sin legajo)",
+        nombre: nombre || "(sin nombre)",
+        panaderia, sector,
+        trainings: {}
+      });
+    }
+    const emp = map.get(key);
+    const cap = norm(row["Capacitacion"]);
+    if (!cap) return;
+    emp.trainings[cap] = {
+      requiere: norm(row["Requiere capacitacion"]),
+      estado: norm(row["Estado capacitacion"]),
+      fecha: norm(row["FECHA"]),
+      vigencia: norm(row["VIGENCIA2"])
+    };
+  });
+  return Array.from(map.values()).sort((a,b) => a.nombre.localeCompare(b.nombre, 'es'));
+}
+
+// ---------- Populate filter dropdowns ----------
+function populateFilters(){
+  const panaderiaSelect = document.getElementById("panaderiaSelect");
+  const sectorSelect = document.getElementById("sectorSelect");
+  const panaderias = Array.from(new Set(employees.map(e => e.panaderia).filter(Boolean))).sort();
+  const sectores = Array.from(new Set(employees.map(e => e.sector).filter(Boolean))).sort();
+
+  panaderiaSelect.innerHTML = '<option value="">Todas</option>' +
+    panaderias.map(p => `<option value="${p}">${p}</option>`).join("");
+  sectorSelect.innerHTML = '<option value="">Todos</option>' +
+    sectores.map(s => `<option value="${s}">${s}</option>`).join("");
+}
+
+// ---------- Stats ----------
+function renderStats(){
+  let total = employees.length;
+  let pendientes = 0, programados = 0, vigentes = 0;
+  employees.forEach(emp => {
+    Object.values(emp.trainings).forEach(t => {
+      const e = normUpper(t.estado);
+      if (normUpper(t.requiere) === "NO") return;
+      if (e === "SIN PROGRAMAR") pendientes++;
+      else if (e === "PROGRAMADO") programados++;
+      else if (e === "VIGENTE") vigentes++;
+    });
+  });
+  const bar = document.getElementById("statsBar");
+  bar.innerHTML = `
+    <div class="stat-card"><div class="num">${total}</div><div class="lbl">Colaboradores</div></div>
+    <div class="stat-card danger"><div class="num">${pendientes}</div><div class="lbl">Capacitaciones sin programar</div></div>
+    <div class="stat-card warn"><div class="num">${programados}</div><div class="lbl">Programadas / pendientes de revisión</div></div>
+    <div class="stat-card ok"><div class="num">${vigentes}</div><div class="lbl">Vigentes</div></div>
+  `;
+}
+
+// ---------- Filtering + render ----------
+function currentFilters(){
+  return {
+    q: norm(document.getElementById("qInput").value).toLowerCase(),
+    panaderia: document.getElementById("panaderiaSelect").value,
+    sector: document.getElementById("sectorSelect").value,
+    estado: document.getElementById("estadoSelect").value
+  };
+}
+
+function employeeMatches(emp, f){
+  if (f.panaderia && emp.panaderia !== f.panaderia) return false;
+  if (f.sector && emp.sector !== f.sector) return false;
+  if (f.q){
+    const hay = (emp.legajo + " " + emp.nombre).toLowerCase();
+    if (!hay.includes(f.q)) return false;
+  }
+  if (f.estado){
+    const values = Object.values(emp.trainings).map(t => normUpper(t.estado));
+    if (!values.includes(f.estado)) return false;
+  }
+  return true;
+}
+
+function renderResults(){
+  const f = currentFilters();
+  const filtered = employees.filter(e => employeeMatches(e, f));
+  const grid = document.getElementById("employeeGrid");
+  const countEl = document.getElementById("resultsCount");
+
+  countEl.textContent = `${filtered.length} colaborador${filtered.length === 1 ? '' : 'es'} encontrado${filtered.length === 1 ? '' : 's'}`;
+
+  if (filtered.length === 0){
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1">
+      <h3>Sin resultados</h3>
+      <p>Probá con otro legajo, nombre o filtro.</p>
+    </div>`;
+    return;
+  }
+
+  grid.innerHTML = filtered.map(emp => {
+    const rows = CAP_ORDER.map(cap => {
+      const t = emp.trainings[cap];
+      if (!t) return "";
+      const cls = statusClass(t.estado, t.requiere);
+      const label = statusLabel(t.estado, t.requiere);
+      const fecha = t.fecha && t.fecha !== "N/A" ? t.fecha : "—";
+      return `<tr>
+        <td class="cap-name">${cap}</td>
+        <td><span class="status-pill ${cls}"><span class="dot"></span>${label}</span></td>
+        <td class="fecha-cell">${fecha}</td>
+      </tr>`;
+    }).join("");
+
+    return `<div class="emp-card">
+      <div class="emp-head">
+        <p class="emp-name">${emp.nombre}</p>
+        <div class="emp-meta">
+          <span class="legajo-chip">Legajo ${emp.legajo}</span>
+          <span><b>${emp.panaderia || '—'}</b></span>
+          <span>${emp.sector || '—'}</span>
+        </div>
+      </div>
+      <table class="train-table">
+        <thead><tr><th>Capacitación</th><th>Estado</th><th>Fecha</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+  }).join("");
+}
+
+function refreshAll(){
+  employees = buildEmployees(rawRows);
+  populateFilters();
+  renderStats();
+  renderResults();
+  publishPortalStats();
+}
+
+// ---------- Resumen para el portal ----------
+// Guarda un resumen liviano que el index del portal lee para mostrar el estado
+// de esta herramienta sin tener que cargar todo el dataset.
+function publishPortalStats(){
+  try{
+    let pendientes = 0, programados = 0, vigentes = 0;
+    employees.forEach(emp => {
+      Object.values(emp.trainings).forEach(t => {
+        if (normUpper(t.requiere) === "NO") return;
+        const e = normUpper(t.estado);
+        if (e === "SIN PROGRAMAR") pendientes++;
+        else if (e === "PROGRAMADO") programados++;
+        else if (e === "VIGENTE") vigentes++;
+      });
+    });
+    const tag = document.getElementById("sourceTag");
+    localStorage.setItem("portal_stats_capacitaciones", JSON.stringify({
+      colaboradores: employees.length,
+      pendientes, programados, vigentes,
+      archivo: tag ? tag.textContent : "",
+      actualizado: new Date().toISOString()
+    }));
+  }catch(e){ /* sin localStorage disponible */ }
+}
+
+// ---------- Data loading ----------
+function loadDemoData(){
+  rawRows = (window.DEMO_BASE_DATA || []);
+  document.getElementById("sourceTag").textContent = "demo";
+  refreshAll();
+}
+
+function loadFromRows(rows, sourceLabel){
+  rawRows = rows;
+  document.getElementById("sourceTag").textContent = sourceLabel;
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(rows)); } catch(e){ /* ignore quota errors */ }
+  refreshAll();
+}
+
+function tryLoadFromStorage(){
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored){
+      const parsed = JSON.parse(stored);
+      if (Array.isArray(parsed) && parsed.length){
+        rawRows = parsed;
+        document.getElementById("sourceTag").textContent = "excel cargado";
+        refreshAll();
+        return true;
+      }
+    }
+  } catch(e){ /* ignore */ }
+  return false;
+}
+
+document.getElementById("fileInput").addEventListener("change", function(evt){
+  const file = evt.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    try {
+      const data = new Uint8Array(e.target.result);
+      const wb = XLSX.read(data, {type: "array"});
+      const sheetName = wb.SheetNames.includes("Base") ? "Base" : wb.SheetNames[0];
+      const sheet = wb.Sheets[sheetName];
+      const rows = XLSX.utils.sheet_to_json(sheet, {defval: "", raw: false});
+      if (!rows.length){
+        alert("No se encontraron filas en la hoja \"" + sheetName + "\".");
+        return;
+      }
+      loadFromRows(rows, file.name);
+    } catch(err){
+      alert("No se pudo leer el archivo. Verificá que sea un .xlsx válido.\n" + err.message);
+    }
+  };
+  reader.readAsArrayBuffer(file);
+});
+
+// ---------- Filter event bindings ----------
+["qInput"].forEach(id => document.getElementById(id).addEventListener("input", renderResults));
+["panaderiaSelect","sectorSelect","estadoSelect"].forEach(id =>
+  document.getElementById(id).addEventListener("change", renderResults)
+);
+document.getElementById("clearFilters").addEventListener("click", function(){
+  document.getElementById("qInput").value = "";
+  document.getElementById("panaderiaSelect").value = "";
+  document.getElementById("sectorSelect").value = "";
+  document.getElementById("estadoSelect").value = "";
+  renderResults();
+});
+
+// ---------- Help modal ----------
+const helpModal = document.getElementById("helpModal");
+document.getElementById("helpBtn").addEventListener("click", () => helpModal.classList.add("open"));
+document.getElementById("closeHelp").addEventListener("click", () => helpModal.classList.remove("open"));
+helpModal.addEventListener("click", (e) => { if (e.target === helpModal) helpModal.classList.remove("open"); });
+
+// ---------- Init ----------
+if (!tryLoadFromStorage()){
+  loadDemoData();
+}
+</script>
+</body>
+</html>

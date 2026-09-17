@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seguridad y Bienestar · Portal de herramientas</title>
+<style>
+:root{
+  --bg:#F5F3EE; --panel:#FFFFFF; --ink:#1E2422; --ink-soft:#5B6560;
+  --line:#DEDAD0; --safety:#F2B705; --safety-dark:#C99400; --teal:#2B6777;
+  --ok:#3F8F5C; --ok-bg:#E7F3EC; --warn:#B4790A; --warn-bg:#FBF0DC;
+  --danger:#B23A2E; --danger-bg:#FBE9E6; --muted:#8B8B82; --muted-bg:#EFEDE6;
+  --radius:12px;
+  --cond:#2B6777;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",sans-serif;
+  line-height:1.45; -webkit-font-smoothing:antialiased;
+  display:flex; flex-direction:column; min-height:100vh;
+}
+h1,h2,h3,.display{font-family:"Segoe UI Semibold","Segoe UI",system-ui,sans-serif;letter-spacing:.005em}
+
+/* ---------- Header ---------- */
+header.app-header{background:var(--ink);color:#F5F3EE;padding:34px 28px 42px;position:relative;overflow:hidden}
+header.app-header::after{
+  content:"";position:absolute;left:0;right:0;bottom:0;height:6px;
+  background:repeating-linear-gradient(135deg,var(--safety) 0px,var(--safety) 16px,var(--ink) 16px,var(--ink) 32px);
+  opacity:.9;
+}
+.header-row{max-width:1120px;margin:0 auto;display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:14px}
+.brand .mark{
+  width:46px;height:46px;border-radius:11px;background:var(--safety);
+  display:flex;align-items:center;justify-content:center;flex:none;
+}
+.brand h1{font-size:29px;font-weight:700;margin:0;line-height:1.05;color:#fff}
+.brand .kicker{
+  font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--safety);margin:0 0 3px;font-weight:600;
+}
+.header-sub{color:#C7CDC8;font-size:14px;margin-top:12px;max-width:620px}
+.header-meta{text-align:right;font-size:12.5px;color:#9BA5A0}
+.header-meta b{color:#E8E4DA;font-weight:600;display:block;font-size:13.5px}
+
+/* ---------- Tarjetas ---------- */
+.tools{max-width:1120px;margin:-26px auto 0;padding:0 28px;position:relative;z-index:2;
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:18px}
+a.tool{
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+  padding:22px 22px 18px;text-decoration:none;color:inherit;display:flex;flex-direction:column;
+  box-shadow:0 2px 0 rgba(30,36,34,.04);position:relative;overflow:hidden;
+  transition:transform .12s ease,box-shadow .15s ease,border-color .15s ease;
+}
+a.tool::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent-c)}
+a.tool:hover{transform:translateY(-3px);box-shadow:0 10px 22px rgba(30,36,34,.10);border-color:var(--accent-c)}
+a.tool:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+.tool-top{display:flex;align-items:center;gap:13px;margin-bottom:10px}
+.tool-icon{width:44px;height:44px;border-radius:10px;flex:none;display:flex;align-items:center;justify-content:center;background:var(--accent-bg)}
+.tool h2{margin:0;font-size:19.5px;font-weight:700;line-height:1.15}
+.tool .cap{font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);font-weight:600;margin-bottom:2px}
+.tool p.desc{font-size:14px;color:var(--ink-soft);margin:0 0 15px;flex:1}
+.tool .tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:15px}
+.tool .tags span{font-size:11.5px;background:var(--muted-bg);color:var(--ink-soft);padding:3px 9px;border-radius:999px}
+
+.statusbox{border-top:1px solid var(--line);padding-top:13px;margin-top:auto}
+.status-line{font-size:12.5px;color:var(--ink-soft);display:flex;align-items:center;gap:7px;margin-bottom:9px}
+.status-line .dot{width:8px;height:8px;border-radius:50%;background:var(--muted);flex:none}
+.status-line.has .dot{background:var(--ok)}
+.status-line.empty .dot{background:var(--muted)}
+.minis{display:flex;gap:16px;flex-wrap:wrap}
+.mini{min-width:52px}
+.mini .n{font-size:20px;font-weight:700;line-height:1.05}
+.mini .l{font-size:10.5px;color:var(--ink-soft);letter-spacing:.02em;margin-top:1px}
+.mini.ok .n{color:var(--ok)} .mini.warn .n{color:var(--warn)} .mini.danger .n{color:var(--danger)}
+.go{margin-top:14px;font-size:13.5px;font-weight:600;color:var(--accent-c);display:flex;align-items:center;gap:6px}
+a.tool:hover .go .arrow{transform:translateX(4px)}
+.go .arrow{transition:transform .15s ease;display:inline-block}
+
+/* temas por herramienta */
+.t-obs{--accent-c:#2B6777;--accent-bg:#E4EEF1}
+.t-cap{--accent-c:#C99400;--accent-bg:#FBF0DC}
+
+/* ---------- Ayuda ---------- */
+.notes{max-width:1120px;margin:30px auto 0;padding:0 28px}
+.notes-panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px 22px}
+.notes-panel h3{margin:0 0 10px;font-size:15px}
+.notes-panel ul{margin:0;padding-left:19px;font-size:13.5px;color:var(--ink-soft)}
+.notes-panel li{margin-bottom:5px}
+.notes-panel code{background:var(--muted-bg);padding:1px 6px;border-radius:4px;font-size:12.5px;font-family:Consolas,monospace}
+.warnbar{
+  max-width:1120px;margin:16px auto 0;padding:0 28px;display:none;
+}
+.warnbar.show{display:block}
+.warnbar div{
+  background:var(--warn-bg);border:1px solid #E7C98A;color:#7A5206;
+  border-radius:10px;padding:11px 16px;font-size:13px;
+}
+footer{text-align:center;font-size:12px;color:var(--ink-soft);padding:26px 20px;margin-top:auto}
+@media(max-width:720px){
+  header.app-header{padding:24px 18px 38px}
+  .tools,.notes,.warnbar{padding-left:18px;padding-right:18px}
+  .header-meta{text-align:left}
+  .brand h1{font-size:24px}
+}
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="header-row">
+    <div>
+      <div class="brand">
+        <div class="mark" aria-hidden="true">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#211C08" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2.5 4 6v6c0 4.7 3.3 8.4 8 9.5 4.7-1.1 8-4.8 8-9.5V6l-8-3.5Z"/>
+            <path d="m8.8 12 2.2 2.2 4.2-4.4"/>
+          </svg>
+        </div>
+        <div>
+          <p class="kicker">Seguridad y Bienestar</p>
+          <h1>Portal de herramientas</h1>
+        </div>
+      </div>
+      <p class="header-sub">Tableros de gestión para el seguimiento de observaciones de seguridad y capacitaciones críticas. Todo corre en tu navegador: los archivos que cargues no se envían a ningún servidor.</p>
+    </div>
+    <div class="header-meta">
+      <b id="hoy"></b>
+      Planta Córdoba
+    </div>
+  </div>
+</header>
+
+<div class="tools">
+
+  <a class="tool t-obs" href="observaciones/index.html">
+    <div class="tool-top">
+      <div class="tool-icon" aria-hidden="true">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2B6777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 3v16.5A1.5 1.5 0 0 0 4.5 21H21"/>
+          <path d="M7 15.5v-3M11.5 15.5v-7M16 15.5v-5M20.5 15.5v-9"/>
+        </svg>
+      </div>
+      <div>
+        <div class="cap">Tablero</div>
+        <h2>Observaciones de Seguridad</h2>
+      </div>
+    </div>
+    <p class="desc">Filtrá y analizá el listado de OS y condiciones: evolución mensual, tasa de cierre, gravedad, centros de trabajo y categorías. Exportá a CSV lo que tengas filtrado.</p>
+    <div class="tags"><span>Excel .xlsx</span><span>Hoja "Listado de OS y condiciones"</span><span>Exporta CSV</span></div>
+    <div class="statusbox">
+      <div class="status-line empty" id="st_obs"><span class="dot"></span><span id="st_obs_txt">Verificando datos guardados…</span></div>
+      <div class="minis" id="mini_obs"></div>
+    </div>
+    <div class="go">Abrir tablero <span class="arrow">&rarr;</span></div>
+  </a>
+
+  <a class="tool t-cap" href="capacitaciones/index.html">
+    <div class="tool-top">
+      <div class="tool-icon" aria-hidden="true">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#C99400" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3 2.5 8 12 13l9.5-5L12 3Z"/>
+          <path d="M6.5 10.3V16c0 1.3 2.5 2.6 5.5 2.6s5.5-1.3 5.5-2.6v-5.7"/>
+          <path d="M21.5 8v5.5"/>
+        </svg>
+      </div>
+      <div>
+        <div class="cap">Control</div>
+        <h2>Capacitaciones Críticas</h2>
+      </div>
+    </div>
+    <p class="desc">Consultá por legajo, nombre, panadería o sector el estado de las cuatro capacitaciones críticas: vigente, programada o sin programar.</p>
+    <div class="tags"><span>Trabajos en caliente</span><span>Espacio confinado</span><span>Trabajo en altura</span><span>Corte y Bloqueo</span></div>
+    <div class="statusbox">
+      <div class="status-line empty" id="st_cap"><span class="dot"></span><span id="st_cap_txt">Verificando datos guardados…</span></div>
+      <div class="minis" id="mini_cap"></div>
+    </div>
+    <div class="go">Abrir control <span class="arrow">&rarr;</span></div>
+  </a>
+
+</div>
+
+<div class="warnbar" id="warnbar">
+  <div><b>Estás abriendo el portal como archivo local (<code>file://</code>).</b> Las herramientas funcionan igual, pero el navegador bloquea la memoria del tablero de observaciones, así que vas a tener que adjuntar el Excel cada vez. Para evitarlo, publicá la carpeta (GitHub Pages) o serví el portal con <code>python -m http.server 8000</code>.</div>
+</div>
+
+<div class="notes">
+  <div class="notes-panel">
+    <h3>Cómo se usa</h3>
+    <ul>
+      <li>Entrá a la herramienta que necesites y cargá el Excel correspondiente. Cada app lee su propia hoja y no se pisan entre sí.</li>
+      <li>El estado que ves en cada tarjeta se actualiza solo, con los últimos datos que cargaste en esa herramienta.</li>
+      <li>Desde adentro de cada tablero volvés acá con el botón <b>&larr; Portal</b> arriba a la izquierda.</li>
+      <li>Ningún archivo sale de tu equipo: todo el procesamiento ocurre en el navegador.</li>
+    </ul>
+  </div>
+</div>
+
+<footer>Seguridad y Bienestar · Planta Córdoba — Los datos se procesan localmente en tu navegador.</footer>
+
+<script>
+(function(){
+  var $ = function(s){ return document.querySelector(s); };
+
+  // Fecha del encabezado
+  try{
+    var f = new Date().toLocaleDateString("es-AR",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+    $("#hoy").textContent = f.charAt(0).toUpperCase() + f.slice(1);
+  }catch(e){ $("#hoy").textContent = new Date().toLocaleDateString(); }
+
+  if(location.protocol === "file:") $("#warnbar").classList.add("show");
+
+  function fmtFecha(iso){
+    try{
+      var d = new Date(iso);
+      return String(d.getDate()).padStart(2,"0")+"/"+String(d.getMonth()+1).padStart(2,"0")+"/"+d.getFullYear();
+    }catch(e){ return ""; }
+  }
+  function nfm(n){ return Number(n||0).toLocaleString("es-AR"); }
+  function minis(sel, items){
+    $(sel).innerHTML = items.map(function(it){
+      return '<div class="mini '+(it[2]||"")+'"><div class="n">'+nfm(it[0])+'</div><div class="l">'+it[1]+'</div></div>';
+    }).join("");
+  }
+  function setStatus(sel, txt, has){
+    var el = $(sel);
+    el.className = "status-line " + (has ? "has" : "empty");
+    $(sel+"_txt").textContent = txt;
+  }
+
+  /* ----- Capacitaciones: resumen en localStorage ----- */
+  (function(){
+    var raw = null;
+    try{ raw = localStorage.getItem("portal_stats_capacitaciones"); }catch(e){}
+    if(!raw){
+      // Puede tener datos cargados sin haber publicado aún el resumen
+      var legacy = null;
+      try{ legacy = localStorage.getItem("capacitaciones_base_v1"); }catch(e){}
+      if(legacy){
+        setStatus("#st_cap","Tenés un Excel cargado. Abrí la herramienta para ver el detalle.", true);
+      } else {
+        setStatus("#st_cap","Sin Excel cargado — abrí y adjuntá la hoja \u201CBase\u201D.", false);
+      }
+      return;
+    }
+    try{
+      var s = JSON.parse(raw);
+      setStatus("#st_cap","Actualizado el "+fmtFecha(s.actualizado)+(s.archivo && s.archivo!=="demo" ? " · "+s.archivo : " · datos de demo"), true);
+      minis("#mini_cap", [
+        [s.colaboradores, "Colaboradores", ""],
+        [s.pendientes, "Sin programar", "danger"],
+        [s.programados, "Programadas", "warn"],
+        [s.vigentes, "Vigentes", "ok"]
+      ]);
+    }catch(e){
+      setStatus("#st_cap","Sin Excel cargado — abrí y adjuntá la hoja \u201CBase\u201D.", false);
+    }
+  })();
+
+  /* ----- Observaciones: resumen en IndexedDB ----- */
+  (function(){
+    if(typeof indexedDB === "undefined"){
+      setStatus("#st_obs","Abrí el tablero y adjuntá el Excel de observaciones.", false);
+      return;
+    }
+    var req;
+    try{ req = indexedDB.open("osdash", 1); }
+    catch(e){ setStatus("#st_obs","Abrí el tablero y adjuntá el Excel de observaciones.", false); return; }
+
+    req.onupgradeneeded = function(){
+      // El portal no crea datos; solo asegura que el store exista para poder leerlo.
+      try{ req.result.createObjectStore("kv"); }catch(e){}
+    };
+    req.onerror = function(){
+      setStatus("#st_obs","Abrí el tablero y adjuntá el Excel de observaciones.", false);
+    };
+    req.onsuccess = function(){
+      var db = req.result;
+      if(!db.objectStoreNames.contains("kv")){
+        setStatus("#st_obs","Sin Excel cargado — abrí y adjuntá el listado de OS.", false);
+        return;
+      }
+      var g;
+      try{ g = db.transaction("kv").objectStore("kv").get("last"); }
+      catch(e){ setStatus("#st_obs","Sin Excel cargado — abrí y adjuntá el listado de OS.", false); return; }
+      g.onerror = function(){ setStatus("#st_obs","Sin Excel cargado — abrí y adjuntá el listado de OS.", false); };
+      g.onsuccess = function(){
+        var v = g.result;
+        if(!v || !v.meta){
+          setStatus("#st_obs","Sin Excel cargado — abrí y adjuntá el listado de OS.", false);
+          return;
+        }
+        setStatus("#st_obs","Actualizado el "+fmtFecha(v.meta.loaded)+" · "+(v.meta.file||""), true);
+        var s = v.stats;
+        if(s){
+          minis("#mini_obs", [
+            [s.total, "Observaciones", ""],
+            [s.pendientes, "Pendientes", "warn"],
+            [s.vencidas, "Vencidas", "danger"],
+            [s.alta, "Gravedad alta", s.altaPend ? "danger" : "ok"]
+          ]);
+        } else if(v.data){
+          minis("#mini_obs", [[v.data.length, "Registros", ""]]);
+        }
+      };
+    };
+  })();
+})();
+</script>
+</body>
+</html>
