@@ -355,7 +355,7 @@
     </div>
     <div class="file-actions">
       <a class="btn btn-ghost" href="../index.html" style="text-decoration:none">&larr; Portal</a>
-      <label class="btn btn-primary" for="fileInput">Cargar Excel (Base)</label>
+      <label class="btn btn-primary" for="fileInput">Cargar Excel (base1)</label>
       <input type="file" id="fileInput" accept=".xlsx,.xls">
       <button class="btn btn-ghost" id="helpBtn" type="button">¿Cómo funciona?</button>
     </div>
@@ -404,7 +404,7 @@
   <div class="modal">
     <h3>Cómo usar esta herramienta</h3>
     <ul>
-      <li>Tocá <b>"Cargar Excel (Base)"</b> y elegí tu archivo. Se lee la hoja <code>Base</code> (o la primera hoja si no existe una con ese nombre).</li>
+      <li>Tocá <b>"Cargar Excel (base1)"</b> y elegí tu archivo. Se lee la hoja <code>base1</code> (o la primera hoja si no existe una con ese nombre).</li>
       <li>Columnas esperadas: <code>PANADERIA</code>, <code>SECTOR</code>, <code>LEGAJO</code>, <code>NOMBRE Y APELLIDO</code>, <code>FECHA</code>, <code>VIGENCIA2</code>, <code>Capacitacion</code>, <code>Requiere capacitacion</code>, <code>Estado capacitacion</code>.</li>
       <li>Buscá por número de legajo o nombre, y filtrá por panadería, sector o estado.</li>
       <li>Los datos quedan guardados en este navegador (no se suben a internet) para que no tengas que volver a cargarlos cada vez.</li>
@@ -655,7 +655,11 @@ document.getElementById("fileInput").addEventListener("change", function(evt){
     try {
       const data = new Uint8Array(e.target.result);
       const wb = XLSX.read(data, {type: "array"});
-      const sheetName = wb.SheetNames.includes("Base") ? "Base" : wb.SheetNames[0];
+      // Busca la hoja "base1" sin distinguir mayusculas ni espacios.
+      // Si no existe, prueba con "Base" (formato anterior) y por ultimo la primera hoja.
+      const normSheet = s => String(s).replace(/\s+/g, "").toLowerCase();
+      const findSheet = name => wb.SheetNames.find(s => normSheet(s) === normSheet(name));
+      const sheetName = findSheet("base1") || findSheet("Base") || wb.SheetNames[0];
       const sheet = wb.Sheets[sheetName];
       const rows = XLSX.utils.sheet_to_json(sheet, {defval: "", raw: false});
       if (!rows.length){

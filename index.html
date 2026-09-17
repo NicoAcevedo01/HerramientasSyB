@@ -11,7 +11,6 @@
   --ok:#3F8F5C; --ok-bg:#E7F3EC; --warn:#B4790A; --warn-bg:#FBF0DC;
   --danger:#B23A2E; --danger-bg:#FBE9E6; --muted:#8B8B82; --muted-bg:#EFEDE6;
   --radius:12px;
-  --cond:#2B6777;
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
@@ -21,9 +20,8 @@ body{
   line-height:1.45; -webkit-font-smoothing:antialiased;
   display:flex; flex-direction:column; min-height:100vh;
 }
-h1,h2,h3,.display{font-family:"Segoe UI Semibold","Segoe UI",system-ui,sans-serif;letter-spacing:.005em}
+h1,h2,h3{font-family:"Segoe UI Semibold","Segoe UI",system-ui,sans-serif;letter-spacing:.005em}
 
-/* ---------- Header ---------- */
 header.app-header{background:var(--ink);color:#F5F3EE;padding:34px 28px 42px;position:relative;overflow:hidden}
 header.app-header::after{
   content:"";position:absolute;left:0;right:0;bottom:0;height:6px;
@@ -32,20 +30,13 @@ header.app-header::after{
 }
 .header-row{max-width:1120px;margin:0 auto;display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap}
 .brand{display:flex;align-items:center;gap:14px}
-.brand .mark{
-  width:46px;height:46px;border-radius:11px;background:var(--safety);
-  display:flex;align-items:center;justify-content:center;flex:none;
-}
+.brand .mark{width:46px;height:46px;border-radius:11px;background:var(--safety);display:flex;align-items:center;justify-content:center;flex:none}
 .brand h1{font-size:29px;font-weight:700;margin:0;line-height:1.05;color:#fff}
-.brand .kicker{
-  font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;
-  color:var(--safety);margin:0 0 3px;font-weight:600;
-}
+.brand .kicker{font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--safety);margin:0 0 3px;font-weight:600}
 .header-sub{color:#C7CDC8;font-size:14px;margin-top:12px;max-width:620px}
 .header-meta{text-align:right;font-size:12.5px;color:#9BA5A0}
 .header-meta b{color:#E8E4DA;font-weight:600;display:block;font-size:13.5px}
 
-/* ---------- Tarjetas ---------- */
 .tools{max-width:1120px;margin:-26px auto 0;padding:0 28px;position:relative;z-index:2;
   display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:18px}
 a.tool{
@@ -69,7 +60,6 @@ a.tool:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
 .status-line{font-size:12.5px;color:var(--ink-soft);display:flex;align-items:center;gap:7px;margin-bottom:9px}
 .status-line .dot{width:8px;height:8px;border-radius:50%;background:var(--muted);flex:none}
 .status-line.has .dot{background:var(--ok)}
-.status-line.empty .dot{background:var(--muted)}
 .minis{display:flex;gap:16px;flex-wrap:wrap}
 .mini{min-width:52px}
 .mini .n{font-size:20px;font-weight:700;line-height:1.05}
@@ -79,25 +69,18 @@ a.tool:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
 a.tool:hover .go .arrow{transform:translateX(4px)}
 .go .arrow{transition:transform .15s ease;display:inline-block}
 
-/* temas por herramienta */
 .t-obs{--accent-c:#2B6777;--accent-bg:#E4EEF1}
 .t-cap{--accent-c:#C99400;--accent-bg:#FBF0DC}
 
-/* ---------- Ayuda ---------- */
 .notes{max-width:1120px;margin:30px auto 0;padding:0 28px}
 .notes-panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px 22px}
 .notes-panel h3{margin:0 0 10px;font-size:15px}
 .notes-panel ul{margin:0;padding-left:19px;font-size:13.5px;color:var(--ink-soft)}
 .notes-panel li{margin-bottom:5px}
 .notes-panel code{background:var(--muted-bg);padding:1px 6px;border-radius:4px;font-size:12.5px;font-family:Consolas,monospace}
-.warnbar{
-  max-width:1120px;margin:16px auto 0;padding:0 28px;display:none;
-}
+.warnbar{max-width:1120px;margin:16px auto 0;padding:0 28px;display:none}
 .warnbar.show{display:block}
-.warnbar div{
-  background:var(--warn-bg);border:1px solid #E7C98A;color:#7A5206;
-  border-radius:10px;padding:11px 16px;font-size:13px;
-}
+.warnbar div{background:var(--warn-bg);border:1px solid #E7C98A;color:#7A5206;border-radius:10px;padding:11px 16px;font-size:13px}
 footer{text-align:center;font-size:12px;color:var(--ink-soft);padding:26px 20px;margin-top:auto}
 @media(max-width:720px){
   header.app-header{padding:24px 18px 38px}
@@ -151,7 +134,7 @@ footer{text-align:center;font-size:12px;color:var(--ink-soft);padding:26px 20px;
     <p class="desc">Filtrá y analizá el listado de OS y condiciones: evolución mensual, tasa de cierre, gravedad, centros de trabajo y categorías. Exportá a CSV lo que tengas filtrado.</p>
     <div class="tags"><span>Excel .xlsx</span><span>Hoja "Listado de OS y condiciones"</span><span>Exporta CSV</span></div>
     <div class="statusbox">
-      <div class="status-line empty" id="st_obs"><span class="dot"></span><span id="st_obs_txt">Verificando datos guardados…</span></div>
+      <div class="status-line" id="st_obs"><span class="dot"></span><span id="st_obs_txt">Verificando datos guardados…</span></div>
       <div class="minis" id="mini_obs"></div>
     </div>
     <div class="go">Abrir tablero <span class="arrow">&rarr;</span></div>
@@ -172,9 +155,9 @@ footer{text-align:center;font-size:12px;color:var(--ink-soft);padding:26px 20px;
       </div>
     </div>
     <p class="desc">Consultá por legajo, nombre, panadería o sector el estado de las cuatro capacitaciones críticas: vigente, programada o sin programar.</p>
-    <div class="tags"><span>Trabajos en caliente</span><span>Espacio confinado</span><span>Trabajo en altura</span><span>Corte y Bloqueo</span></div>
+    <div class="tags"><span>Hoja "base1"</span><span>Trabajos en caliente</span><span>Espacio confinado</span><span>Trabajo en altura</span><span>Corte y Bloqueo</span></div>
     <div class="statusbox">
-      <div class="status-line empty" id="st_cap"><span class="dot"></span><span id="st_cap_txt">Verificando datos guardados…</span></div>
+      <div class="status-line" id="st_cap"><span class="dot"></span><span id="st_cap_txt">Verificando datos guardados…</span></div>
       <div class="minis" id="mini_cap"></div>
     </div>
     <div class="go">Abrir control <span class="arrow">&rarr;</span></div>
@@ -190,7 +173,7 @@ footer{text-align:center;font-size:12px;color:var(--ink-soft);padding:26px 20px;
   <div class="notes-panel">
     <h3>Cómo se usa</h3>
     <ul>
-      <li>Entrá a la herramienta que necesites y cargá el Excel correspondiente. Cada app lee su propia hoja y no se pisan entre sí.</li>
+      <li>Entrá a la herramienta que necesites y cargá el Excel correspondiente. Observaciones lee la hoja <code>Listado de OS y condiciones</code>; Capacitaciones lee la hoja <code>base1</code>.</li>
       <li>El estado que ves en cada tarjeta se actualiza solo, con los últimos datos que cargaste en esa herramienta.</li>
       <li>Desde adentro de cada tablero volvés acá con el botón <b>&larr; Portal</b> arriba a la izquierda.</li>
       <li>Ningún archivo sale de tu equipo: todo el procesamiento ocurre en el navegador.</li>
@@ -204,7 +187,6 @@ footer{text-align:center;font-size:12px;color:var(--ink-soft);padding:26px 20px;
 (function(){
   var $ = function(s){ return document.querySelector(s); };
 
-  // Fecha del encabezado
   try{
     var f = new Date().toLocaleDateString("es-AR",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
     $("#hoy").textContent = f.charAt(0).toUpperCase() + f.slice(1);
@@ -225,8 +207,7 @@ footer{text-align:center;font-size:12px;color:var(--ink-soft);padding:26px 20px;
     }).join("");
   }
   function setStatus(sel, txt, has){
-    var el = $(sel);
-    el.className = "status-line " + (has ? "has" : "empty");
+    $(sel).className = "status-line " + (has ? "has" : "");
     $(sel+"_txt").textContent = txt;
   }
 
@@ -235,14 +216,10 @@ footer{text-align:center;font-size:12px;color:var(--ink-soft);padding:26px 20px;
     var raw = null;
     try{ raw = localStorage.getItem("portal_stats_capacitaciones"); }catch(e){}
     if(!raw){
-      // Puede tener datos cargados sin haber publicado aún el resumen
       var legacy = null;
       try{ legacy = localStorage.getItem("capacitaciones_base_v1"); }catch(e){}
-      if(legacy){
-        setStatus("#st_cap","Tenés un Excel cargado. Abrí la herramienta para ver el detalle.", true);
-      } else {
-        setStatus("#st_cap","Sin Excel cargado — abrí y adjuntá la hoja \u201CBase\u201D.", false);
-      }
+      if(legacy) setStatus("#st_cap","Tenés un Excel cargado. Abrí la herramienta para ver el detalle.", true);
+      else setStatus("#st_cap","Sin Excel cargado — abrí y adjuntá la hoja \u201Cbase1\u201D.", false);
       return;
     }
     try{
@@ -255,43 +232,30 @@ footer{text-align:center;font-size:12px;color:var(--ink-soft);padding:26px 20px;
         [s.vigentes, "Vigentes", "ok"]
       ]);
     }catch(e){
-      setStatus("#st_cap","Sin Excel cargado — abrí y adjuntá la hoja \u201CBase\u201D.", false);
+      setStatus("#st_cap","Sin Excel cargado — abrí y adjuntá la hoja \u201Cbase1\u201D.", false);
     }
   })();
 
   /* ----- Observaciones: resumen en IndexedDB ----- */
   (function(){
-    if(typeof indexedDB === "undefined"){
-      setStatus("#st_obs","Abrí el tablero y adjuntá el Excel de observaciones.", false);
-      return;
-    }
+    var vacio = "Sin Excel cargado — abrí y adjuntá el listado de OS.";
+    if(typeof indexedDB === "undefined"){ setStatus("#st_obs", vacio, false); return; }
     var req;
     try{ req = indexedDB.open("osdash", 1); }
-    catch(e){ setStatus("#st_obs","Abrí el tablero y adjuntá el Excel de observaciones.", false); return; }
+    catch(e){ setStatus("#st_obs", vacio, false); return; }
 
-    req.onupgradeneeded = function(){
-      // El portal no crea datos; solo asegura que el store exista para poder leerlo.
-      try{ req.result.createObjectStore("kv"); }catch(e){}
-    };
-    req.onerror = function(){
-      setStatus("#st_obs","Abrí el tablero y adjuntá el Excel de observaciones.", false);
-    };
+    req.onupgradeneeded = function(){ try{ req.result.createObjectStore("kv"); }catch(e){} };
+    req.onerror = function(){ setStatus("#st_obs", vacio, false); };
     req.onsuccess = function(){
       var db = req.result;
-      if(!db.objectStoreNames.contains("kv")){
-        setStatus("#st_obs","Sin Excel cargado — abrí y adjuntá el listado de OS.", false);
-        return;
-      }
+      if(!db.objectStoreNames.contains("kv")){ setStatus("#st_obs", vacio, false); return; }
       var g;
       try{ g = db.transaction("kv").objectStore("kv").get("last"); }
-      catch(e){ setStatus("#st_obs","Sin Excel cargado — abrí y adjuntá el listado de OS.", false); return; }
-      g.onerror = function(){ setStatus("#st_obs","Sin Excel cargado — abrí y adjuntá el listado de OS.", false); };
+      catch(e){ setStatus("#st_obs", vacio, false); return; }
+      g.onerror = function(){ setStatus("#st_obs", vacio, false); };
       g.onsuccess = function(){
         var v = g.result;
-        if(!v || !v.meta){
-          setStatus("#st_obs","Sin Excel cargado — abrí y adjuntá el listado de OS.", false);
-          return;
-        }
+        if(!v || !v.meta){ setStatus("#st_obs", vacio, false); return; }
         setStatus("#st_obs","Actualizado el "+fmtFecha(v.meta.loaded)+" · "+(v.meta.file||""), true);
         var s = v.stats;
         if(s){
